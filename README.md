@@ -28,29 +28,19 @@ This project tracks and visualizes vulnerability data (CVEs) for key open source
 
 ### Tracked Projects
 
-#### Linux Distributions
-- **Debian Linux**
-  - CPE Pattern: `cpe:2.3:o:debian:debian_linux:*`
-  - Focus on major releases (10, 11, 12)
-  
-- **Alpine Linux**
-  - CPE Pattern: `cpe:2.3:o:alpinelinux:alpine_linux:*`
-  - Focus on current stable releases
+The system tracks vulnerabilities for a diverse set of open source projects and technologies, organized into several categories:
 
-#### Open Source Applications
-- **NGINX**
-  - CPE Pattern: `cpe:2.3:a:f5:nginx_open_source:*` (F5 nginx open source)
-  - Description Keywords: `nginx open source`, `nginx plus`
-  - Web server vulnerabilities
-  
-- **Redis**
-  - CPE Pattern: `cpe:2.3:a:redis:redis:*`
-  - Description Keywords: `redis is an open source`, `redis is a`
-  - In-memory database vulnerabilities
-  
-- **PostgreSQL**
-  - CPE Pattern: `cpe:2.3:a:postgresql:postgresql:*`
-  - Database server vulnerabilities
+- **Web Servers & Reverse Proxies**: NGINX, Apache HTTP Server, Apache Tomcat
+- **JavaScript Runtimes**: Node.js, Bun, Deno  
+- **Programming Languages**: Python, PHP, Perl, Go, Java, .NET
+- **Web Frameworks**: FastAPI, Django, Flask
+- **Databases & Caching**: Redis, PostgreSQL, Memcached
+- **Message Queues**: RabbitMQ
+- **Build Tools**: Apache Maven, Gradle
+- **System Tools**: BusyBox, Bash, Fluent Bit
+- **Operating Systems**: Debian Linux, Alpine Linux
+
+Each project is configured with CPE (Common Platform Enumeration) patterns for precise vulnerability matching, plus fallback description keywords for CVEs awaiting analysis. The complete list of tracked projects and their configurations can be found in `src/data/cve-fetcher.js`.
 
 ### Data Collection Architecture
 
@@ -70,7 +60,9 @@ This project tracks and visualizes vulnerability data (CVEs) for key open source
 3. **Caching Layer** (`src/data/cache/`)
    - `cve-data-{year}.json` - CVEs grouped by project for detailed analysis
    - `cve-timeline-{year}.json` - Chronological CVE events for visualization
-   - `nvdcve-{year}.json` - Raw NVD feed data (cached)
+   - `nvdcve-{year}-chunks/` - Raw NVD feed data split into manageable chunks
+     - `metadata.json` - Feed metadata and chunk information
+     - `chunk-001.json`, `chunk-002.json`, etc. - Chunked CVE data (5000 CVEs per chunk)
 
 4. **Observable Data Loaders** (`src/data/*.js`)
    - CVE timeline data formatted for chart consumption
