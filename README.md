@@ -42,16 +42,6 @@ The notebook supports analysis of any open source project through an **interacti
 - **Get real-time feedback** - See which projects match available CVE data immediately
 - **Mix and match categories** - Combine any projects from these supported categories:
 
-  - **Web Servers & Reverse Proxies**: NGINX, Apache HTTP Server, Apache Tomcat
-  - **JavaScript Runtimes**: Node.js, Bun, Deno  
-  - **Programming Languages**: Python, PHP, Perl, Go, Java, .NET
-  - **Web Frameworks**: FastAPI, Django, Flask
-  - **Databases & Caching**: Redis, PostgreSQL, Memcached
-  - **Message Queues**: RabbitMQ
-  - **Build Tools**: Apache Maven, Gradle
-  - **System Tools**: BusyBox, Bash, Fluent Bit
-  - **Operating Systems**: Debian Linux, Alpine Linux
-
 Project normalization is handled by `src/data/project-normalizer.js`, which converts user-friendly names to standardized identifiers. Each project is configured with CPE (Common Platform Enumeration) patterns for precise vulnerability matching, plus fallback description keywords for CVEs awaiting analysis.
 
 ### Data Collection Architecture
@@ -125,19 +115,18 @@ The system will automatically:
 This is an [Observable Framework](https://observablehq.com/framework/) notebook designed for **interactive use**:
 
 ### Getting Started
+
+**Option 1: Using Docker (Recommended - no Node.js installation required)**
+1. **Build the container**: `docker build -t vuln-data .`
+2. **Run the application**: `docker run -p 3000:3000 vuln-data`
+3. **Open in browser**: Visit <http://localhost:3000>
+4. **Customize analysis**: Edit the project list in the text area to analyze your preferred projects
+
+**Option 2: Using Node.js directly**
 1. **Install dependencies**: `npm install`
 2. **Start the notebook**: `npm run dev`
 3. **Open in browser**: Visit <http://localhost:3000>
 4. **Customize analysis**: Edit the project list in the text area to analyze your preferred projects
-
-### Interactive Elements
-- **Project Selection**: Editable text area where you can specify which projects to analyze
-- **Real-time Updates**: All charts and data automatically refresh when you change selections
-- **Severity Filtering**: Checkboxes to show/hide different CVE severity levels
-- **Data Tables**: Sortable, filterable tables with detailed CVE information
-- **Responsive Charts**: Timeline and severity distribution charts that adapt to your data
-
-For more about Observable Framework, see <https://observablehq.com/framework/getting-started>.
 
 ## Project structure
 
