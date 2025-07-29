@@ -1,10 +1,17 @@
 # Vuln Data
 
-A vulnerability tracking dashboard that visualizes CVE publication frequency for popular open source projects and Linux distributions.
+An interactive Observable notebook that analyzes and visualizes CVE (Common Vulnerabilities and Exposures) publication trends for open source projects. Users can customize project selections and explore security timelines through interactive charts and data tables.
 
 ## Overview
 
-This project tracks and visualizes vulnerability data (CVEs) for key open source projects to help understand security trends over time. The system automatically collects CVE data from various sources and presents it through interactive charts showing publication frequency, severity distributions, and temporal patterns.
+This Interactive Observable notebook enables users to:
+- **Customize project selections** - Enter any open source projects you want to analyze through an editable text input
+- **Visualize CVE timelines** - See vulnerability publication trends over time with interactive charts
+- **Analyze severity distributions** - Filter and view CVE severity levels (Critical, High, Medium, Low)
+- **Browse detailed CVE data** - Explore individual vulnerability records with full details
+- **Real-time updates** - The notebook automatically updates all charts and data when you change project selections
+
+The system intelligently normalizes project names (e.g., "NodeJS" → "nodejs", "GoLang" → "golang") and matches them against CVE data from 2023-2025.
 
 ## Data Collection Plan
 
@@ -26,21 +33,26 @@ This project tracks and visualizes vulnerability data (CVEs) for key open source
    - Debian Security Advisory (DSA) feeds
    - Alpine Linux security database
 
-### Tracked Projects
+### Interactive Project Selection
 
-The system tracks vulnerabilities for a diverse set of open source projects and technologies, organized into several categories:
+The notebook supports analysis of any open source project through an **interactive text input**. Users can:
 
-- **Web Servers & Reverse Proxies**: NGINX, Apache HTTP Server, Apache Tomcat
-- **JavaScript Runtimes**: Node.js, Bun, Deno  
-- **Programming Languages**: Python, PHP, Perl, Go, Java, .NET
-- **Web Frameworks**: FastAPI, Django, Flask
-- **Databases & Caching**: Redis, PostgreSQL, Memcached
-- **Message Queues**: RabbitMQ
-- **Build Tools**: Apache Maven, Gradle
-- **System Tools**: BusyBox, Bash, Fluent Bit
-- **Operating Systems**: Debian Linux, Alpine Linux
+- **Enter custom project lists** - Type project names one per line in the editable text area
+- **Use common names** - The system understands variations like "NodeJS", "GoLang", "Python3"
+- **Get real-time feedback** - See which projects match available CVE data immediately
+- **Mix and match categories** - Combine any projects from these supported categories:
 
-Each project is configured with CPE (Common Platform Enumeration) patterns for precise vulnerability matching, plus fallback description keywords for CVEs awaiting analysis. The complete list of tracked projects and their configurations can be found in `src/data/cve-fetcher.js`.
+  - **Web Servers & Reverse Proxies**: NGINX, Apache HTTP Server, Apache Tomcat
+  - **JavaScript Runtimes**: Node.js, Bun, Deno  
+  - **Programming Languages**: Python, PHP, Perl, Go, Java, .NET
+  - **Web Frameworks**: FastAPI, Django, Flask
+  - **Databases & Caching**: Redis, PostgreSQL, Memcached
+  - **Message Queues**: RabbitMQ
+  - **Build Tools**: Apache Maven, Gradle
+  - **System Tools**: BusyBox, Bash, Fluent Bit
+  - **Operating Systems**: Debian Linux, Alpine Linux
+
+Project normalization is handled by `src/data/project-normalizer.js`, which converts user-friendly names to standardized identifiers. Each project is configured with CPE (Common Platform Enumeration) patterns for precise vulnerability matching, plus fallback description keywords for CVEs awaiting analysis.
 
 ### Data Collection Architecture
 
@@ -51,22 +63,29 @@ Each project is configured with CPE (Common Platform Enumeration) patterns for p
    - Generates both project-grouped and timeline data formats
    - Handles both current year and historical data feeds
 
-2. **Data Processing Pipeline** (Integrated in `cve-fetcher.js`)
+2. **Project Name Normalizer** (`src/data/project-normalizer.js`) - **NEW**
+   - Converts user-friendly project names to standardized format
+   - Handles common variations and aliases (e.g., "NodeJS" → "nodejs")
+   - Supports 100+ project name mappings for better user experience
+   - Provides transformation debugging for transparency
+
+3. **Data Processing Pipeline** (Integrated in `cve-fetcher.js`)
    - Extract project-specific CVEs from bulk feed data using configurable patterns
    - Normalize severity scores and classifications
    - Generate timeline events for visualization
    - Support for both CPE-based and description-based matching
 
-3. **Caching Layer** (`src/data/cache/`)
+4. **Caching Layer** (`src/data/cache/`)
    - `cve-data-{year}.json` - CVEs grouped by project for detailed analysis
    - `cve-timeline-{year}.json` - Chronological CVE events for visualization
    - `nvdcve-{year}-chunks/` - Raw NVD feed data split into manageable chunks
      - `metadata.json` - Feed metadata and chunk information
      - `chunk-001.json`, `chunk-002.json`, etc. - Chunked CVE data (5000 CVEs per chunk)
 
-4. **Observable Data Loaders** (`src/data/*.js`)
-   - CVE timeline data formatted for chart consumption
-   - Project-specific CVE datasets
+5. **Observable Data Loaders** (`src/data/*.js`)
+   - `cve-multi-year.json.js` - Multi-year weekly CVE aggregation data
+   - `cve-weekly.json.js` - Weekly CVE timeline data
+   - Project-specific CVE datasets with interactive filtering
    - Severity distribution calculations
 
 ### Data Update Strategy
@@ -101,21 +120,24 @@ The system will automatically:
 - Fall back to description keyword matching for CVEs awaiting analysis
 - Include the new project in both grouped and timeline outputs
 
-This is an [Observable Framework](https://observablehq.com/framework/) app. To install the required dependencies, run:
+## Interactive Features
 
-```
-npm install
-```
+This is an [Observable Framework](https://observablehq.com/framework/) notebook designed for **interactive use**:
 
-Then, to start the local preview server, run:
+### Getting Started
+1. **Install dependencies**: `npm install`
+2. **Start the notebook**: `npm run dev`
+3. **Open in browser**: Visit <http://localhost:3000>
+4. **Customize analysis**: Edit the project list in the text area to analyze your preferred projects
 
-```
-npm run dev
-```
+### Interactive Elements
+- **Project Selection**: Editable text area where you can specify which projects to analyze
+- **Real-time Updates**: All charts and data automatically refresh when you change selections
+- **Severity Filtering**: Checkboxes to show/hide different CVE severity levels
+- **Data Tables**: Sortable, filterable tables with detailed CVE information
+- **Responsive Charts**: Timeline and severity distribution charts that adapt to your data
 
-Then visit <http://localhost:3000> to preview your app.
-
-For more, see <https://observablehq.com/framework/getting-started>.
+For more about Observable Framework, see <https://observablehq.com/framework/getting-started>.
 
 ## Project structure
 
@@ -125,20 +147,20 @@ A typical Framework project looks like this:
 .
 ├─ src
 │  ├─ components
-│  │  └─ timeline.js           # timeline visualization component
+│  │  └─ timeline.js              # timeline visualization component
 │  ├─ data
-│  │  ├─ cache/                # cached CVE data
-│  │  │  ├─ cve-data-2024.json       # CVEs grouped by project
-│  │  │  ├─ cve-timeline-2024.json   # timeline events for visualization  
-│  │  │  └─ nvdcve-2024.json         # raw NVD feed data
-│  │  ├─ cve-fetcher.js        # CVE data collection script
-│  │  ├─ launches.csv.js       # space launch data loader
-│  │  └─ events.json           # timeline events data
-│  ├─ example-dashboard.md     # dashboard example page
-│  ├─ example-report.md        # report example page
-│  └─ index.md                 # the home page
+│  │  ├─ cache/                   # cached CVE data
+│  │  │  ├─ cve-data-{year}.json       # CVEs grouped by project
+│  │  │  ├─ cve-timeline-{year}.json   # timeline events for visualization  
+│  │  │  └─ nvdcve-{year}-chunks/      # chunked raw NVD feed data
+│  │  ├─ cve-fetcher.js           # CVE data collection script
+│  │  ├─ project-normalizer.js    # project name normalization (NEW)
+│  │  ├─ cve-multi-year.json.js   # multi-year aggregated data loader
+│  │  ├─ cve-weekly.json.js       # weekly timeline data loader
+│  │  └─ launches.csv.js          # space launch data loader
+│  └─ index.md                    # interactive notebook home page
 ├─ .gitignore
-├─ observablehq.config.js      # the app config file
+├─ observablehq.config.js         # the app config file
 ├─ package.json
 └─ README.md
 ```

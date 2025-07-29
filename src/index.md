@@ -46,8 +46,6 @@ const rawProjectInput = Generators.input(projectInput);
 
 ${projectInput}
 
-The text box above contains a list of popular open source projects. Feel free to edit this list - you can use common names like "NodeJS", "GoLang", or "Python3" and the system will understand them.
-
 ## Step 2: Process and load CVE data
 
 The system standardizes project names, configures CVE search patterns, and loads vulnerability data.
@@ -444,14 +442,6 @@ const cveDetails = allTimelineData
     const severityOrder = { 'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3, 'UNKNOWN': 4 };
     return severityOrder[a.severity] - severityOrder[b.severity];
   });
-
-// Show summary
-display(html`<div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 6px; padding: 12px; margin: 15px 0;">
-  <strong>📋 CVE Details</strong><br/>
-  <div style="font-size: 14px; color: #495057; margin-top: 5px;">
-    Found <strong>${cveDetails.length} CVE records</strong> across ${selectedProjectKeys.length} projects from 2023-2025
-  </div>
-</div>`);
 
 cveDetails
 ```
