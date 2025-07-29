@@ -51,12 +51,13 @@ ${projectInput}
 The system standardizes project names, configures CVE search patterns, and loads vulnerability data.
 
 ```js
-// Import project normalization functions
+// Import project normalization functions and project configurations
 import { 
   normalizeProjectName, 
   parseProjectNames, 
   showTransformations 
 } from "./data/project-normalizer.js";
+import { TRACKED_PROJECTS } from "./data/project-configs.js";
 
 // Load the weekly CVE data
 const weeklyData = await FileAttachment("data/cve-multi-year.json").json();
@@ -68,50 +69,14 @@ const parsedProjects = initialTransformations.map(item => item.normalized)
   .filter(name => name && typeof name === 'string' && name.trim().length > 0)
   .map(name => name.trim());
 
-// Known project configurations with CVE search patterns
-const KNOWN_PROJECTS = {
-  nginx: { name: 'NGINX', cpePatterns: ['cpe:2.3:a:f5:nginx_open_source:*'], descriptionKeywords: ['nginx open source', 'nginx plus'] },
-  apache: { name: 'Apache HTTP Server', cpePatterns: ['cpe:2.3:a:apache:http_server:*'], descriptionKeywords: ['apache http server', 'apache httpd'] },
-  nodejs: { name: 'Node.js', cpePatterns: ['cpe:2.3:a:nodejs:node.js:*'], descriptionKeywords: ['node.js', 'nodejs'] },
-  python3: { name: 'Python', cpePatterns: ['cpe:2.3:a:python:python:*'], descriptionKeywords: ['python programming language', 'cpython'] },
-  golang: { name: 'Go', cpePatterns: ['cpe:2.3:a:golang:go:*'], descriptionKeywords: ['go programming language', 'golang'] },
-  java: { name: 'Java', cpePatterns: ['cpe:2.3:a:oracle:jdk:*', 'cpe:2.3:a:oracle:openjdk:*'], descriptionKeywords: ['oracle java', 'openjdk'] },
-  php: { name: 'PHP', cpePatterns: ['cpe:2.3:a:php:php:*'], descriptionKeywords: ['php programming language', 'php hypertext preprocessor'] },
-  redis: { name: 'Redis', cpePatterns: ['cpe:2.3:a:redis:redis:*'], descriptionKeywords: ['redis is an open source', 'redis is a'] },
-  postgresql: { name: 'PostgreSQL', cpePatterns: ['cpe:2.3:a:postgresql:postgresql:*'], descriptionKeywords: ['postgresql database'] },
-  mysql: { name: 'MySQL', cpePatterns: ['cpe:2.3:a:mysql:mysql:*', 'cpe:2.3:a:oracle:mysql:*'], descriptionKeywords: ['mysql database', 'mysql server'] },
-  docker: { name: 'Docker', cpePatterns: ['cpe:2.3:a:docker:docker:*'], descriptionKeywords: ['docker container', 'docker engine'] },
-  kubernetes: { name: 'Kubernetes', cpePatterns: ['cpe:2.3:a:kubernetes:kubernetes:*'], descriptionKeywords: ['kubernetes orchestration', 'kubernetes cluster', 'k8s'] },
-  bash: { name: 'Bash', cpePatterns: ['cpe:2.3:a:gnu:bash:*'], descriptionKeywords: ['bash shell', 'gnu bash'] },
-  busybox: { name: 'BusyBox', cpePatterns: ['cpe:2.3:a:busybox:busybox:*'], descriptionKeywords: ['busybox utilities'] },
-  tomcat: { name: 'Apache Tomcat', cpePatterns: ['cpe:2.3:a:apache:tomcat:*'], descriptionKeywords: ['apache tomcat'] },
-  perl: { name: 'Perl', cpePatterns: ['cpe:2.3:a:perl:perl:*'], descriptionKeywords: ['perl programming language'] },
-  fastapi: { name: 'FastAPI', cpePatterns: ['cpe:2.3:a:tiangolo:fastapi:*'], descriptionKeywords: ['fastapi framework', 'fastapi is a'] },
-  django: { name: 'Django', cpePatterns: ['cpe:2.3:a:djangoproject:django:*'], descriptionKeywords: ['django framework', 'django web framework'] },
-  flask: { name: 'Flask', cpePatterns: ['cpe:2.3:a:palletsprojects:flask:*'], descriptionKeywords: ['flask framework', 'flask web framework'] },
-  dotnet: { name: '.NET', cpePatterns: ['cpe:2.3:a:microsoft:.net:*', 'cpe:2.3:a:microsoft:.net_core:*'], descriptionKeywords: ['microsoft .net', 'dotnet core'] },
-  maven: { name: 'Apache Maven', cpePatterns: ['cpe:2.3:a:apache:maven:*'], descriptionKeywords: ['apache maven', 'maven build tool'] },
-  gradle: { name: 'Gradle', cpePatterns: ['cpe:2.3:a:gradle:gradle:*'], descriptionKeywords: ['gradle build tool'] },
-  openssl: { name: 'OpenSSL', cpePatterns: ['cpe:2.3:a:openssl:openssl:*'], descriptionKeywords: ['openssl cryptography', 'openssl ssl'] },
-  curl: { name: 'cURL', cpePatterns: ['cpe:2.3:a:haxx:curl:*', 'cpe:2.3:a:haxx:libcurl:*'], descriptionKeywords: ['curl library', 'libcurl'] },
-  ubuntu: { name: 'Ubuntu', cpePatterns: ['cpe:2.3:o:canonical:ubuntu_linux:*'], descriptionKeywords: ['ubuntu linux', 'ubuntu operating system'] },
-  debian: { name: 'Debian Linux', cpePatterns: ['cpe:2.3:o:debian:debian_linux:*'], descriptionKeywords: ['debian linux', 'debian operating system'] },
-  alpine: { name: 'Alpine Linux', cpePatterns: ['cpe:2.3:o:alpinelinux:alpine_linux:*'], descriptionKeywords: ['alpine linux', 'alpine operating system'] },
-  bun: { name: 'Bun', cpePatterns: ['cpe:2.3:a:oven:bun:*'], descriptionKeywords: ['bun javascript runtime', 'bun runtime'] },
-  deno: { name: 'Deno', cpePatterns: ['cpe:2.3:a:deno:deno:*'], descriptionKeywords: ['deno runtime', 'deno is a'] },
-  fluentbit: { name: 'Fluent Bit', cpePatterns: ['cpe:2.3:a:fluentbit:fluent_bit:*'], descriptionKeywords: ['fluent bit', 'fluent-bit'] },
-  rabbitmq: { name: 'RabbitMQ', cpePatterns: ['cpe:2.3:a:rabbitmq:rabbitmq:*', 'cpe:2.3:a:pivotal:rabbitmq:*'], descriptionKeywords: ['rabbitmq message broker'] },
-  memcached: { name: 'Memcached', cpePatterns: ['cpe:2.3:a:memcached:memcached:*'], descriptionKeywords: ['memcached caching system'] }
-};
-
-// Create project configuration
+// Create project configuration using imported TRACKED_PROJECTS
 function createTrackedProjectsConfig(projectNames) {
   const config = {};
   const unknown = [];
   
   projectNames.forEach(name => {
-    if (KNOWN_PROJECTS[name]) {
-      config[name] = KNOWN_PROJECTS[name];
+    if (TRACKED_PROJECTS[name]) {
+      config[name] = TRACKED_PROJECTS[name];
     } else {
       const displayName = name.charAt(0).toUpperCase() + name.slice(1);
       config[name] = {
