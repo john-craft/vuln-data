@@ -5,7 +5,7 @@ toc: false
 
 # CVE Timeline Analysis
 
-This notebook analyzes CVE (Common Vulnerabilities and Exposures) publication trends for open source projects. You can customize the list of projects and visualize their security timelines over time.
+This is an interactive notebook that analyzes CVE publication trends for open source projects from [NIST data](https://nvd.nist.gov/vuln/data-feeds). You can customize the list of projects and visualize their security timelines over time.
 
 ## Step 1: Choose your projects
 
@@ -148,9 +148,16 @@ const totalCves = filteredWeeklyData.reduce((sum, week) => sum + (week.total || 
 const activeWeeks = filteredWeeklyData.filter(week => week.total > 0).length;
 
 // Show processing summary
-display(html`<div style="background: #e8f5e8; border: 1px solid #4caf50; border-radius: 6px; padding: 15px; margin: 20px 0;">
+display(html`<div style="
+  background: light-dark(#e8f5e8, #1a2e1a); 
+  border: 1px solid light-dark(#4caf50, #66bb6a); 
+  border-radius: 6px; 
+  padding: 15px; 
+  margin: 20px 0;
+  color: light-dark(#1b5e20, #c8e6c9);
+">
   <strong>✅ Data Processing Complete</strong><br/>
-  <div style="font-size: 14px; color: #2e7d32; margin-top: 8px;">
+  <div style="font-size: 14px; margin-top: 8px;">
     • Processed <strong>${parsedProjects.length} projects</strong> with standardized names<br/>
     • Found <strong>${totalCves} CVEs</strong> across <strong>${selectedProjectKeys.length} matching projects</strong><br/>
     • Loaded CVE data from 2023-2025 for analysis
@@ -175,9 +182,9 @@ const projectColors = {
 };
 ```
 
-## CVE Timeline Chart
+## Frequency Chart
 
-CVE publication timeline showing vulnerability trends across your selected projects.
+This chart shows how often CVEs are published.
 
 ```js
 function createTimelineChart(data, projectKeys, trackedProjectsConfig, projectColorsMap, {width}) {
@@ -439,7 +446,7 @@ cveDetails
         shortDescription: 400
       },
       format: {
-        cve: (d) => html`<code style="font-size: 12px; background: #f8f9fa; padding: 2px 4px; border-radius: 3px;">${d}</code>`,
+        cve: (d) => html`<code style="font-size: 12px; background: light-dark(#f8f9fa, #2d3748); color: light-dark(#495057, #e2e8f0); padding: 2px 4px; border-radius: 3px;">${d}</code>`,
         severity: (d) => html`<span style="
           padding: 3px 8px; 
           border-radius: 4px; 
@@ -462,6 +469,6 @@ cveDetails
 
 ## Summary
 
-Analysis complete: **${selectedProjectKeys.length} projects** with **${totalCves} total CVEs** from 2023-2025.
+Analysis complete: **${selectedProjectKeys.length} projects** with **${totalCves} total CVEs** from 2023-2025. Average: **${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} CVEs per week** across ${activeWeeks} weeks with data.
 
 To analyze different projects, edit the project list in Step 1 and the notebook will automatically update.
