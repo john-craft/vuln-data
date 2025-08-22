@@ -22,7 +22,6 @@ Redis
 Tomcat
 Busybox
 Java
-debian
 alpine
 `,
   rows: 15
@@ -163,17 +162,18 @@ const activeWeeks = filteredWeeklyData.filter(week => week.total > 0).length;
 
 // Show processing summary
 display(html`<div style="
-  background: light-dark(#e8f5e8, #1a2e1a); 
-  border: 1px solid light-dark(#4caf50, #66bb6a); 
-  border-radius: 6px; 
-  padding: 15px; 
-  margin: 20px 0;
-  color: light-dark(#1b5e20, #c8e6c9);
+  background: light-dark(#f8f9fa, #2d3748); 
+  border: 1px solid light-dark(#dee2e6, #4a5568); 
+  border-radius: 4px; 
+  padding: 10px; 
+  margin: 15px 0;
+  color: light-dark(#6c757d, #a0aec0);
+  font-size: 13px;
 ">
-  <strong>✅ Data Processing Complete</strong><br/>
-  <div style="font-size: 14px; margin-top: 8px;">
-    • Processed <strong>${parsedProjects.length} projects</strong> with standardized names<br/>
-    • Found <strong>${totalCves} CVEs</strong> across <strong>${selectedProjectKeys.length} matching projects</strong><br/>
+  <strong>Data Processing Complete</strong><br/>
+  <div style="margin-top: 6px;">
+    • Processed ${parsedProjects.length} projects with standardized names<br/>
+    • Found ${totalCves} CVEs across ${selectedProjectKeys.length} matching projects<br/>
     • Loaded CVE data from 2023-2025 for analysis
     ${unknownProjects.length > 0 ? `<br/>• ${unknownProjects.length} unknown projects using fallback patterns` : ''}
   </div>
@@ -198,11 +198,39 @@ const projectColors = {
 
 ## Summary
 
-**${selectedProjectKeys.length} projects** with **${totalCves} total CVEs** from 2023-2025.
-
-Average: **${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} CVEs per week** across ${activeWeeks} weeks.
-
-**Engineering cost: ${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} * 4 hours per CVE = ${activeWeeks > 0 ? ((totalCves / activeWeeks) * 4).toFixed(1) : '0'} per week!**
+<div style="
+  background: light-dark(#fff3cd, #3d2f0d); 
+  border: 2px solid light-dark(#ffc107, #ffcc33); 
+  border-radius: 8px; 
+  padding: 20px; 
+  margin: 25px 0;
+  color: light-dark(#856404, #fff3a0);
+">
+  <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">
+    📊 Vulnerability Impact Analysis
+  </div>
+  
+  <div style="font-size: 16px; line-height: 1.6;">
+    <strong>${selectedProjectKeys.length} projects</strong> with <strong>${totalCves} total CVEs</strong> from 2023-2025<br/>
+    Average: <strong>${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} CVEs per week</strong> across ${activeWeeks} weeks
+  </div>
+  
+  <div style="
+    font-size: 20px; 
+    font-weight: bold; 
+    margin-top: 20px; 
+    padding: 15px;
+    background: light-dark(#dc3545, #8b1538);
+    color: white;
+    border-radius: 6px;
+    text-align: center;
+  ">
+    🚨 Engineering Cost: ${activeWeeks > 0 ? ((totalCves / activeWeeks) * 4).toFixed(1) : '0'} hours lost per week!
+    <div style="font-size: 14px; font-weight: normal; margin-top: 8px; opacity: 0.9;">
+      (${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} CVEs × 4 hours remediation per CVE)
+    </div>
+  </div>
+</div>
 
 ## Frequency Chart
 
