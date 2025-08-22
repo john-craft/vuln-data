@@ -226,6 +226,19 @@ export const TRACKED_PROJECTS = {
       'maven build tool'
     ]
   },
+
+  // Big Data Processing
+  spark: {
+    name: 'Apache Spark',
+    cpePatterns: [
+      'cpe:2.3:a:apache:spark:*'
+    ],
+    descriptionKeywords: [
+      'apache spark',
+      'spark framework',
+      'spark engine'
+    ]
+  },
   gradle: {
     name: 'Gradle',
     cpePatterns: [
@@ -317,7 +330,19 @@ export const TRACKED_PROJECTS = {
     ],
     descriptionKeywords: [
       'debian linux',
-      'debian operating system'
+      'debian operating system',
+      'debian',
+      'debian platform'
+    ]
+  },
+  kernel: {
+    name: 'Linux Kernel',
+    cpePatterns: [
+      'cpe:2.3:o:linux:linux_kernel:*'
+    ],
+    descriptionKeywords: [
+      'linux kernel',
+      'kernel vulnerability'
     ]
   },
   alpine: {

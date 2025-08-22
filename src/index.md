@@ -3,9 +3,9 @@ theme: dashboard
 toc: false
 ---
 
-# CVE Timeline Analysis
+# CVE Cost Calculator
 
-This is an interactive notebook that analyzes CVE publication trends for open source projects from [NIST data](https://nvd.nist.gov/vuln/data-feeds). You can customize the list of projects and visualize their security timelines over time.
+This is an interactive notebook that analyzes CVE publication trends to estimate the cost of remediating vulnerabilities. Each vulnerability per week has a cost associated with remediation. You can customize the list of projects and visualize their security timelines over time.
 
 ## Step 1: Choose your projects
 
@@ -14,6 +14,21 @@ Enter the open source projects you want to analyze, one per line. You can edit t
 ```js
 // Editable project input
 const projectInput = Inputs.textarea({
+  value: `NodeJS
+spark
+Python3
+Nginx
+Redis
+Tomcat
+Busybox
+Java
+debian
+alpine
+`,
+  rows: 15
+});
+
+const oldData = {
   value: `NodeJS
 Bun
 Deno
@@ -36,9 +51,8 @@ Dotnet
 Maven
 Gradle
 Java
-Fluent-Bit`,
-  rows: 15
-});
+Fluent-Bit`
+}
 
 // Make it reactive
 const rawProjectInput = Generators.input(projectInput);
@@ -181,6 +195,14 @@ const projectColors = {
   deno: "#377eb8", fluentbit: "#bebada", rabbitmq: "#fccde5", memcached: "#ccebc5"
 };
 ```
+
+## Summary
+
+**${selectedProjectKeys.length} projects** with **${totalCves} total CVEs** from 2023-2025.
+
+Average: **${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} CVEs per week** across ${activeWeeks} weeks.
+
+**Engineering cost: ${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} * 4 hours per CVE = ${activeWeeks > 0 ? ((totalCves / activeWeeks) * 4).toFixed(1) : '0'} per week!**
 
 ## Frequency Chart
 
@@ -467,8 +489,10 @@ cveDetails
   </div>
 </div>
 
-## Summary
 
-Analysis complete: **${selectedProjectKeys.length} projects** with **${totalCves} total CVEs** from 2023-2025. Average: **${activeWeeks > 0 ? (totalCves / activeWeeks).toFixed(1) : '0'} CVEs per week** across ${activeWeeks} weeks with data.
+## Data source
+
+- Open source projects from [NIST data](https://nvd.nist.gov/vuln/data-feeds).
+- [Debian CVE feed](https://security-tracker.debian.org/tracker/data/json)
 
 To analyze different projects, edit the project list in Step 1 and the notebook will automatically update.
