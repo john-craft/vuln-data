@@ -101,6 +101,10 @@ export function normalizeProjectName(name) {
     'caddy': 'caddy',
     'traefik': 'traefik',
     'haproxy': 'haproxy',
+    'spark': 'spark',
+    'kernel': 'kernel',
+    'linux': 'kernel',
+    'linux-kernel': 'kernel',
     'lua': 'lua'
   };
   
